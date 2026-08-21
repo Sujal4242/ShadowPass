@@ -9,34 +9,11 @@ ShadowPass is a complete Midnight dApp that solves the **Private Allowlist Acces
 
 ---
 
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Level 3 Alignment](#level-3-alignment)
-- [Key Features](#key-features)
-- [How It Works](#how-it-works)
-- [Privacy Model](#privacy-model)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Smart Contract](#smart-contract)
-- [Wallet & Midnight Integration](#wallet--midnight-integration)
-- [Running Locally](#running-locally)
-- [Testing](#testing)
-- [CI/CD](#cicd)
-- [Preprod Deployment](#preprod-deployment)
-- [Demo](#demo)
-- [Security & Secrets](#security--secrets)
-- [Project Status](#project-status)
-- [Level 3 Submission Checklist](#level-3-submission-checklist)
-- [License](#license)
-
----
-
-## Project Overview
+## Overview
 
 Access control systems routinely require users to prove authorization — but traditional approaches reveal *who* is requesting access, creating surveillance risk. ShadowPass solves this by decoupling identity from authorization.
 
-ShadowPass implements the **Private Allowlist Access** problem from the Midnight Level 3 requirements. A user proves membership in an authorized allowlist using a zero-knowledge proof:
+A user proves membership in an authorized allowlist using a zero-knowledge proof:
 
 - The user possesses a private credential: `(memberId, salt)`.
 - A Compact smart contract stores 8 Pedersen commitments on-chain, one per allowlist slot.
@@ -48,24 +25,18 @@ The result: the blockchain verifies "this user is authorized" without learning *
 
 ---
 
-## Level 3 Alignment
+## Why ShadowPass?
 
-| Requirement | ShadowPass Implementation | Status |
-|---|---|---|
-| Meaningful Midnight privacy functionality | ZK proof of membership without credential disclosure | Done |
-| Private Allowlist Access idea | 8-slot allowlist with Pedersen commitments | Done |
-| Smart contract | `contracts/shadowpass.compact` (Compact language) | Done |
-| Zero-knowledge proof | Groth16 proof via `persistentCommit` circuit | Done |
-| Wallet integration | Midnight DApp Connector (1AM / Lace) | Done |
-| Tests | 28/28 passing (contract, circuit, wallet state) | Done |
-| CI/CD | GitHub Actions: compile → TypeScript → build → test | Done |
-| Public GitHub repository | [Sujal4242/ShadowPass](https://github.com/Sujal4242/ShadowPass) | Done |
-| 10 meaningful commits | 10 commits covering all development phases | Done |
-| Privacy model documentation | Documented in this README and `docs/evidence/` | Done |
+Most access control systems leak identity. Every login, every badge scan, every credential check creates a trail. ShadowPass breaks that trail by proving authorization without disclosure.
+
+- **No identity leak** — the blockchain never learns which member requested access
+- **No credential exposure** — the raw membership data never leaves the browser
+- **No linkability** — multiple verifications by the same member cannot be connected on-chain
+- **Full on-chain verification** — the proof is verified by the smart contract, not a trusted server
 
 ---
 
-## Key Features
+## Features
 
 - **Private membership verification** — prove you're on the allowlist without revealing which entry you hold
 - **Zero-knowledge proof flow** — Groth16 proof generated entirely in the browser
@@ -115,23 +86,19 @@ Access Granted / Denied
 
 ## Privacy Model
 
-### What an observer CAN learn
+### What an observer can learn
 
 - A proof of membership was submitted to the contract
 - The `accessCount` incremented (total number of successful verifications)
 - The contract address and allowlist commitments (8 Pedersen hashes)
 - The ZK proof data (Groth16 proof bytes)
 
-### What an observer CANNOT learn
+### What remains private
 
 - The raw `memberId` or `salt` used to generate the proof
 - Which of the 8 allowlist slots matched the credential
 - The identity or wallet address of the prover (membership is verified via commitment, not wallet address)
 - Any linking between multiple proofs from the same member
-
-### Disclaimer
-
-The privacy guarantee applies to the membership proof and credential data. It does not imply that all blockchain metadata or wallet activity is anonymous. Network-level metadata, wallet connection events, and transaction timing may be observable by the wallet provider or network infrastructure.
 
 ---
 
@@ -161,44 +128,6 @@ The app uses 7 midnight-js providers assembled in `frontend/src/midnight/provide
 | Public Data | `indexerPublicDataProvider()` — Midnight Preprod indexer |
 | Wallet | `connectedAPI` — DApp Connector |
 | Midnight | `connectedAPI` — DApp Connector |
-
----
-
-## Project Structure
-
-```
-ShadowPass/
-├── .github/workflows/ci.yml    # CI: compile → TypeScript → build → test
-├── contracts/
-│   └── shadowpass.compact       # Compact privacy contract (26 lines)
-├── docs/
-│   ├── evidence/                # Deployment evidence, architecture, credentials
-│   └── history/                 # Development phase documentation
-├── frontend/
-│   ├── public/midnight/         # ZK assets (zkir, keys) — copied at build time
-│   ├── scripts/                 # Build scripts (copy-zk-assets)
-│   ├── src/
-│   │   ├── App.tsx              # Main application component
-│   │   ├── components/          # UI components (12 files)
-│   │   ├── hooks/               # React hooks (useMidnight, useShadowPass, usePhase1)
-│   │   ├── midnight/            # Midnight provider layer (5 files)
-│   │   └── shims/               # Browser polyfills (cross-fetch, isomorphic-ws)
-│   ├── index.html               # HTML entry point
-│   ├── vite.config.ts           # Vite configuration
-│   └── package.json             # Frontend dependencies
-├── scripts/
-│   ├── deploy-v2.ts             # Contract deployment script
-│   └── wallet-state.ts          # Wallet state inspection utility
-├── tests/
-│   ├── shadowpass.test.ts       # Contract/circuit tests (13 tests)
-│   └── wallet-state.test.ts     # Wallet state tests (15 tests)
-├── compose.yml                  # Local proof server configuration
-├── package.json                 # Root dependencies and scripts
-├── tsconfig.json                # Root TypeScript config
-├── vitest.config.ts             # Test configuration
-├── PROPOSAL.md                  # Level 3 submission proposal
-└── README.md                    # This file
-```
 
 ---
 
@@ -260,41 +189,32 @@ ShadowPass connects to the user's Midnight-compatible wallet via the **DApp Conn
 ### Installation
 
 ```bash
-# Install root dependencies
 npm install
-
-# Install frontend dependencies
 npm --prefix frontend install
 ```
 
 ### Compilation
 
 ```bash
-# Compile the Compact contract
 npm run compile
 ```
 
 ### Tests
 
 ```bash
-# Run all 28 tests
 npm test
 ```
 
 ### TypeScript Check
 
 ```bash
-# Typecheck root project
 npm run build
-
-# Typecheck frontend
 cd frontend && npx tsc -b --noEmit
 ```
 
 ### Frontend Development
 
 ```bash
-# Start Vite dev server
 npm run dev:frontend
 # → http://localhost:5173
 ```
@@ -302,7 +222,6 @@ npm run dev:frontend
 ### Production Build
 
 ```bash
-# Build frontend for production
 npm run build:frontend
 ```
 
@@ -372,7 +291,7 @@ Triggered on push to `main` and pull requests to `main`.
 | **Compiler** | Compact 0.31.1 |
 | **Runtime** | compact-runtime 0.16.0 |
 
-> **Note:** Midnight Preprod is a test network. Test tokens are obtained from the network faucet. No real value is at stake.
+> Midnight Preprod is a test network. Test tokens are obtained from the network faucet. No real value is at stake.
 
 Full deployment evidence: [`docs/evidence/DOCUMENT.md`](docs/evidence/DOCUMENT.md)
 
@@ -403,7 +322,7 @@ These credentials are **public by design** for demonstration purposes. See [`doc
 
 ---
 
-## Security & Secrets
+## Security
 
 The repository is configured to **never commit** sensitive material:
 
@@ -433,19 +352,24 @@ The deployment script (`scripts/deploy-v2.ts`) requires `SHADOWPASS_DEPLOYER_SEE
 
 ---
 
-## Level 3 Submission Checklist
+## Level 3 Submission
 
-- [x] Private Allowlist Access selected
-- [x] Functional Midnight privacy functionality
-- [x] Minimum 3 tests passing (28/28)
-- [x] CI/CD workflow
-- [x] Public GitHub repository
-- [x] README privacy model
-- [x] Minimum 10 meaningful commits
-- [ ] Live demo link
-- [ ] Test-output screenshot
-- [ ] 1-minute demo video
-- [ ] Product proposal approval
+| Requirement | Status |
+|---|---|
+| Private Allowlist Access selected | Done |
+| Functional Midnight privacy functionality | Done |
+| Smart contract on Midnight | Done |
+| Zero-knowledge proof | Done |
+| Wallet integration | Done |
+| Minimum 3 tests passing | Done (28/28) |
+| CI/CD workflow | Done |
+| Public GitHub repository | Done |
+| README privacy model | Done |
+| Minimum 10 meaningful commits | Done (11) |
+| Live demo link | Pending |
+| Test-output screenshot | Pending |
+| 1-minute demo video | Pending |
+| Product proposal approval | Pending |
 
 ---
 
