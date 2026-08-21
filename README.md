@@ -7,6 +7,27 @@
 
 ShadowPass is a complete Midnight dApp that solves the **Private Allowlist Access** problem. Users prove they are members of an authorized allowlist using a zero-knowledge proof — without revealing their identity, membership credential, or salt. The Groth16 ZK proof is generated entirely in the browser and verified on-chain by a Compact smart contract deployed to Midnight Preprod.
 
+## Live Demo
+
+**[Launch ShadowPass →](https://shadowpass.netlify.app/)**
+
+ShadowPass is deployed on Midnight Preprod and can be tested directly in the browser.
+
+## Demo Video
+
+**[Watch the ShadowPass Demo →](https://youtu.be/awoQSnAiCgo)**
+
+The video demonstrates:
+- Connecting the Midnight wallet
+- Entering the membership credential
+- Generating a zero-knowledge proof in the browser
+- Wallet approval
+- On-chain verification
+- Successful Groth16 proof verification
+- Privacy-preserving verification without revealing the underlying credential
+
+> The demo video is unlisted on YouTube.
+
 ---
 
 ## Overview
@@ -322,6 +343,40 @@ These credentials are **public by design** for demonstration purposes. See [`doc
 
 ---
 
+## Screenshots
+
+### Live Deployment
+
+The ShadowPass landing page deployed on Midnight Preprod.
+
+![ShadowPass live deployment](docs/evidence/screenshots/shadowpass-live.jpeg)
+
+### Wallet Connected
+
+The Midnight wallet connected via DApp Connector, showing the verification interface ready for credential input.
+
+![Midnight wallet connected](docs/evidence/screenshots/wallet-connected.jpeg)
+
+### Successful Proof Verification
+
+A Groth16 zero-knowledge proof verified on-chain. The transaction hash, block number, and incremented access count confirm successful membership verification.
+
+![ShadowPass proof verified on-chain](docs/evidence/screenshots/proof-verified.jpeg)
+
+### Test Suite
+
+All 28 automated tests passing — covering Compact contract logic, Groth16 proof generation, ZK circuit verification, and wallet state persistence.
+
+![ShadowPass test suite with 28 passing tests](docs/evidence/screenshots/tests-28-of-28.jpeg)
+
+### Continuous Integration
+
+GitHub Actions CI workflow passing on every push to `main`.
+
+![ShadowPass GitHub Actions CI passing](docs/evidence/screenshots/ci-passing.jpeg)
+
+---
+
 ## Security
 
 The repository is configured to **never commit** sensitive material:
@@ -366,9 +421,9 @@ The deployment script (`scripts/deploy-v2.ts`) requires `SHADOWPASS_DEPLOYER_SEE
 | Public GitHub repository | Done |
 | README privacy model | Done |
 | Minimum 10 meaningful commits | Done (11) |
-| Live demo link | Pending |
-| Test-output screenshot | Pending |
-| 1-minute demo video | Pending |
+| Live demo link | Done |
+| Test-output screenshot | Done |
+| 1-minute demo video | Done |
 | Product proposal approval | Pending |
 
 ---
